@@ -1,0 +1,58 @@
+name: build-and-test
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+on:
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+env:
+  PipelineEnvironment: true
+  NUGET_XMLDOC_MODE: skip
+
+jobs:
+  platform-tests:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 11.0.100-rc.3.26522.148
+
+      - name: Restore tests
+        run: dotnet restore test/Soenneker.QrCodes.Reader.Tests/Soenneker.QrCodes.Reader.Tests.csproj --verbosity minimal
+
+      - name: Build tests
+        run: dotnet build test/Soenneker.QrCodes.Reader.Tests/Soenneker.QrCodes.Reader.Tests.csproj --configuration Release --no-restore --verbosity minimal
+
+      - name: Test
+        run: dotnet test --project test/Soenneker.QrCodes.Reader.Tests/Soenneker.QrCodes.Reader.Tests.csproj --configuration Release --no-build --no-restore --verbosity minimal
+
+      - name: Pack
+        run: dotnet pack src/Soenneker.QrCodes.Reader/Soenneker.QrCodes.Reader.csproj --configuration Release --no-build --no-restore --output . --verbosity minimal
+
+  build-and-test:
+    if: always()
+    needs: platform-tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify all platforms passed
+        env:
+          RESULT: ${{ needs.platform-tests.result }}
+        run: test "$RESULT" = "success"

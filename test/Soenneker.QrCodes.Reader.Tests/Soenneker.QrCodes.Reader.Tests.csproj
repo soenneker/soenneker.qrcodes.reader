@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net11.0</TargetFramework>
+        <Features Condition="'$(TargetFramework)' == 'net11.0'">$(Features);runtime-async=on</Features>
+        <Nullable>enable</Nullable>
+        <IsPackable>false</IsPackable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <None Update="Fixtures\**\*.png" CopyToOutputDirectory="PreserveNewest" />
+        <None Remove="appsettings.json" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Content Include="appsettings.json">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Soenneker.Utils.Test" Version="11.0.344" />
+        <PackageReference Include="Soenneker.Tests.HostedUnit" Version="11.0.346" />
+        <PackageReference Include="TUnit" Version="1.76.28" />
+        <PackageReference Include="ZXing.Net" Version="0.16.11" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\src\Soenneker.QrCodes.Reader\Soenneker.QrCodes.Reader.csproj" />
+    </ItemGroup>
+
+</Project>
