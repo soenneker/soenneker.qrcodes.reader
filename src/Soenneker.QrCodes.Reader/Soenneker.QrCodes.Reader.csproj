@@ -46,6 +46,5 @@
 
     <ItemGroup>
         <InternalsVisibleTo Include="Soenneker.QrCodes.Reader.Tests" />
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="11.0.0-rc.3.26522.148" />
     </ItemGroup>
 </Project>
